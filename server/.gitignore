@@ -1,0 +1,109 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+# -----------------------------
+# 🔐 ENV (VERY IMPORTANT)
+# -----------------------------
+.env
+.env.local
+.env.development
+.env.production
+
+# -----------------------------
+# 📦 Node modules
+# -----------------------------
+node_modules/
+
+# -----------------------------
+# 🧱 Build outputs
+# -----------------------------
+.next/
+out/
+dist/
+build/
+
+# -----------------------------
+# 🧾 Logs
+# -----------------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -----------------------------
+# 🗂 Uploads (your multer folder)
+# -----------------------------
+uploads/
+
+# -----------------------------
+# 🧪 Temp / cache
+# -----------------------------
+.cache/
+.tmp/
+temp/
+
+# -----------------------------
+# 🖥 OS files
+# -----------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------
+# 🧠 VS Code / IDE
+# -----------------------------
+.vscode/
+.idea/
+
+# -----------------------------
+# 🔑 Secrets
+# -----------------------------
+*.pem
+*.key
+
+# -----------------------------
+# 📊 Coverage
+# -----------------------------
+coverage/
+
+# -----------------------------
+# 🧪 Test outputs
+# -----------------------------
+jest.config.js
