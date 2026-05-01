@@ -195,6 +195,7 @@
 //         </div>
 //     );
 // }
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -210,7 +211,7 @@ type Customer = {
     paidMonths: number;
     durationMonths: number;
     totalAmount: number;
-    dueDate: string; // ✅ FIXED (maturityDate → dueDate)
+    dueDate: string;
 };
 
 type CardProps = {
@@ -231,42 +232,58 @@ export default function Dashboard() {
             return;
         }
 
-        setData(JSON.parse(user));
+        const u = JSON.parse(user);
+
+        // ✅ FIELD MAPPING FIX
+        setData({
+            name: u.name,
+            phone: u.accountNo,
+            paidMonths: u.monthPaid,
+            monthlyAmount: u.amount,
+            dueDate: u.dueDate,
+            totalAmount: u.totalAmount || u.monthPaid * u.amount,
+            status: u.status || "Running",
+            durationMonths: u.durationMonths || 60,
+        });
     }, [router]);
 
     if (!data) return <p className="p-6">Loading...</p>;
 
-    // 🔥 BASE DATE (DB)
-    const nextDue = new Date(data.dueDate);
+    // ✅ SAFE DATE
+    const nextDue = data.dueDate ? new Date(data.dueDate) : null;
 
-    // 🔥 RULE: 60 / 120 months
+    const isValidDate = (d: any) => d && !isNaN(new Date(d).getTime());
+
+    let lastPaidDate: Date | null = null;
+    let maturityDate: Date | null = null;
+    let daysLeft = 0;
+    let monthsRemaining = 0;
+
     const totalDuration = data.paidMonths <= 60 ? 60 : 120;
 
-    const monthsRemaining = totalDuration - data.paidMonths;
+    if (isValidDate(nextDue)) {
+        monthsRemaining = totalDuration - data.paidMonths;
 
-    // 🔥 Maturity
-    const maturityDate = new Date(nextDue);
-    maturityDate.setMonth(nextDue.getMonth() + monthsRemaining);
+        maturityDate = new Date(nextDue!);
+        maturityDate.setMonth(nextDue!.getMonth() + monthsRemaining);
 
-    // 🔥 Last paid
-    const lastPaidDate = new Date(nextDue);
-    lastPaidDate.setMonth(nextDue.getMonth() - 1);
+        lastPaidDate = new Date(nextDue!);
+        lastPaidDate.setMonth(nextDue!.getMonth() - 1);
 
-    // 🔥 Days left
-    const today = new Date();
-    const daysLeft = Math.ceil(
-        (nextDue.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-    );
+        const today = new Date();
+        daysLeft = Math.ceil(
+            (nextDue!.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+        );
+    }
 
-    // 🔥 Financials
-    const remaining = monthsRemaining;
+    // 💰 FINANCIALS
     const totalExpected = totalDuration * data.monthlyAmount;
     const remainingAmount = totalExpected - data.totalAmount;
 
     return (
         <div className="min-h-screen bg-gray-100 p-4 md:p-8">
 
-            {/* HEADER */}
+            {/* 🔥 HEADER */}
             <div className="bg-white p-6 rounded-2xl shadow mb-6">
                 <h1 className="text-xl md:text-2xl font-bold">
                     Welcome, {data.name}
@@ -277,8 +294,13 @@ export default function Dashboard() {
                 </p>
 
                 <div className="mt-4 flex gap-3 flex-wrap">
-                    <a href="tel:09451143203" className="bg-blue-400 text-white px-4 py-2 rounded-lg text-sm">Call</a>
-                    <a href="https://wa.me/919451143203" className="bg-green-400 text-white px-4 py-2 rounded-lg text-sm">WhatsApp</a>
+                    <a href="tel:09451143203" className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm">
+                        📞 Call
+                    </a>
+
+                    <a href="https://wa.me/919451143203" className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm">
+                        💬 WhatsApp
+                    </a>
 
                     <button
                         onClick={() => {
@@ -292,26 +314,26 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* SAVINGS */}
+            {/* 💰 SAVINGS */}
             <div className="bg-white p-6 rounded-2xl shadow mb-6">
                 <h2 className="font-semibold mb-3">Your Savings</h2>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
                     <p>Saved: ₹{data.totalAmount}</p>
                     <p>Remaining: ₹{remainingAmount}</p>
-                    <p>Months Left: {remaining}</p>
+                    <p>Months Left: {monthsRemaining}</p>
                 </div>
             </div>
 
-            {/* CARDS */}
+            {/* 📊 CARDS */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <Card title="Monthly Deposit" value={`₹${data.monthlyAmount}`} />
                 <Card title="Months Paid" value={data.paidMonths} />
-                <Card title="Months Left" value={remaining} />
+                <Card title="Months Left" value={monthsRemaining} />
                 <Card title="Total Savings" value={`₹${data.totalAmount}`} />
             </div>
 
-            {/* PROGRESS */}
+            {/* 📈 PROGRESS */}
             <div className="bg-white p-6 rounded-2xl shadow mb-6 text-center">
                 <h2 className="font-semibold mb-4">Progress</h2>
 
@@ -322,7 +344,7 @@ export default function Dashboard() {
                 </p>
             </div>
 
-            {/* ACCOUNT DETAILS */}
+            {/* 📅 ACCOUNT DETAILS */}
             <div className="bg-white p-6 rounded-2xl shadow mb-6">
                 <h2 className="font-semibold mb-3">Account Details</h2>
 
@@ -330,26 +352,37 @@ export default function Dashboard() {
                     <p>Account: {data.phone}</p>
                     <p>Status: {data.status}</p>
 
-                    <p>📅 Last Paid: {lastPaidDate.toDateString()}</p>
+                    <p>
+                        📅 Last Paid:{" "}
+                        {isValidDate(lastPaidDate)
+                            ? lastPaidDate!.toDateString()
+                            : "N/A"}
+                    </p>
 
                     <p className="text-blue-600">
-                        ⏭ Next Due: {nextDue.toDateString()}
+                        ⏭ Next Due:{" "}
+                        {isValidDate(nextDue)
+                            ? nextDue!.toDateString()
+                            : "N/A"}
                     </p>
 
                     <p className="text-red-500">
-                        ⏳ Due in {daysLeft} days
+                        ⏳ Due in {daysLeft > 0 ? daysLeft : 0} days
                     </p>
 
                     <p className="text-green-600 font-medium">
-                        🎯 Complete: {maturityDate.toLocaleDateString("en-IN", {
-                            month: "long",
-                            year: "numeric",
-                        })}
+                        🎯 Complete:{" "}
+                        {isValidDate(maturityDate)
+                            ? maturityDate!.toLocaleDateString("en-IN", {
+                                month: "long",
+                                year: "numeric",
+                            })
+                            : "N/A"}
                     </p>
                 </div>
             </div>
 
-            {/* FEEDBACK */}
+            {/* ⭐ FEEDBACK */}
             <div className="mb-6">
                 <FeedbackForm />
             </div>
@@ -367,6 +400,7 @@ function Card({ title, value }: CardProps) {
     );
 }
 
+// ⭐ FEEDBACK FORM
 function FeedbackForm() {
     const [rating, setRating] = useState(5);
     const [message, setMessage] = useState("");
