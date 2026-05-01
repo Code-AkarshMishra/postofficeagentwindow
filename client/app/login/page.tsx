@@ -26,7 +26,19 @@ export default function Login() {
 
             if (data.success) {
                 localStorage.setItem("token", data.token);
-                localStorage.setItem("user", JSON.stringify(data.user));
+                // localStorage.setItem("user", JSON.stringify(data.user));
+                const u = data.user;
+
+                localStorage.setItem("user", JSON.stringify({
+                    name: u.name,
+                    phone: u.accountNo,
+                    paidMonths: u.monthPaid,
+                    monthlyAmount: u.amount,
+                    dueDate: u.dueDate,
+                    totalAmount: u.totalAmount || (u.monthPaid * u.amount),
+                    status: u.status || "Running",
+                    durationMonths: 60
+                }));
                 router.push("/dashboard");
             } else {
                 alert("Invalid details");
