@@ -9,7 +9,9 @@ type Customer = {
     name: string;
     phone: string;
     paidMonths: number;
+    durationMonths: number;
     totalAmount: number;
+    maturityDate?: string | null;
 };
 
 export default function CustomersPage() {
@@ -72,6 +74,8 @@ export default function CustomersPage() {
                             <th className="p-2 text-left">Name</th>
                             <th className="p-2 text-left">Account</th>
                             <th className="p-2 text-left">Paid</th>
+                            <th className="p-2 text-left">Left</th>
+                            <th className="p-2 text-left">Maturity</th>
                             <th className="p-2 text-left">Total</th>
                             <th className="p-2 text-left">Action</th>
                         </tr>
@@ -80,13 +84,13 @@ export default function CustomersPage() {
                     <tbody>
                         {loading ? (
                             <tr>
-                                <td colSpan={5} className="p-4 text-center text-gray-500">
+                                <td colSpan={7} className="p-4 text-center text-gray-500">
                                     Loading customers...
                                 </td>
                             </tr>
                         ) : filtered.length === 0 ? (
                             <tr>
-                                <td colSpan={5} className="p-4 text-center text-gray-500">
+                                <td colSpan={7} className="p-4 text-center text-gray-500">
                                     No customers found
                                 </td>
                             </tr>
@@ -96,6 +100,12 @@ export default function CustomersPage() {
                                     <td className="p-2">{customer.name}</td>
                                     <td className="p-2">{customer.phone}</td>
                                     <td className="p-2">{customer.paidMonths}</td>
+                                    <td className="p-2">{Math.max(customer.durationMonths - customer.paidMonths, 0)}</td>
+                                    <td className="p-2">
+                                        {customer.maturityDate
+                                            ? new Date(customer.maturityDate).toLocaleDateString()
+                                            : "-"}
+                                    </td>
                                     <td className="p-2">₹{customer.totalAmount}</td>
 
                                     <td className="p-2">

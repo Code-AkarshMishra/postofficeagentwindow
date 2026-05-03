@@ -3,6 +3,7 @@ const path = require("path");
 const bcrypt = require("bcryptjs");
 const xlsx = require("xlsx");
 const Customer = require("../models/Customer");
+const { getCustomerProgress } = require("./maturity");
 
 const BATCH_SIZE = 100;
 
@@ -64,7 +65,8 @@ function normalizeCustomer(row) {
   const paidMonths = Number(pick(row, ["monthPaid", "paidMonths", "paid", "monthsPaid"]) || 0);
   const monthlyAmount = Number(pick(row, ["amount", "monthlyAmount", "deposit", "installment"]) || 0);
   const dueDate = pick(row, ["dueDate", "maturityDate", "date"]);
-  const durationMonths = paidMonths <= 60 ? 60 : 120;
+  const parsedDueDate = parseDate(dueDate);
+  const progress = getCustomerProgress(paidMonths, parsedDueDate);
 
   if (!accountNo || accountNo.length < 4) return null;
 
@@ -75,10 +77,11 @@ function normalizeCustomer(row) {
     scheme: String(pick(row, ["scheme"]) || "RD").trim(),
     monthlyAmount,
     paidMonths,
-    durationMonths,
+    durationMonths: progress.durationMonths,
     totalAmount: paidMonths * monthlyAmount,
-    maturityDate: parseDate(dueDate),
-    status: paidMonths >= durationMonths ? "Completed" : "Running",
+    dueDate: parsedDueDate,
+    maturityDate: progress.maturityDate,
+    status: progress.status,
   };
 }
 

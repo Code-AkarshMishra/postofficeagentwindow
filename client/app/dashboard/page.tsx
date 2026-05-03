@@ -13,7 +13,8 @@ type Customer = {
     paidMonths: number;
     durationMonths: number;
     totalAmount: number;
-    maturityDate: string;
+    dueDate?: string | null;
+    maturityDate?: string | null;
 };
 
 type CardProps = {
@@ -42,11 +43,14 @@ export default function Dashboard() {
 
     if (!data) return <p className="p-6">Loading...</p>;
 
-    const remaining = data.durationMonths - data.paidMonths;
+    const remaining = Math.max(data.durationMonths - data.paidMonths, 0);
     const totalExpected = data.durationMonths * data.monthlyAmount;
     const remainingAmount = totalExpected - data.totalAmount;
-    const due = new Date(data.maturityDate);
-    const daysLeft = Math.ceil((due.getTime() - todayMs) / (1000 * 60 * 60 * 24));
+    const due = data.dueDate ? new Date(data.dueDate) : null;
+    const maturity = data.maturityDate ? new Date(data.maturityDate) : null;
+    const daysLeft = due
+        ? Math.ceil((due.getTime() - todayMs) / (1000 * 60 * 60 * 24))
+        : null;
 
     return (
         <div className="min-h-screen bg-gray-100 p-4 md:p-8">
@@ -115,8 +119,11 @@ export default function Dashboard() {
                     <p>Account Number: {data.phone}</p>
                     <p>Scheme: RD</p>
                     <p>Status: {data.status}</p>
-                    <p>Maturity Date: {due.toDateString()}</p>
-                    <p className="text-red-500 mt-2">Next installment due in {daysLeft} days</p>
+                    <p>Next Due Date: {due ? due.toDateString() : "Not available"}</p>
+                    <p>Maturity Date: {maturity ? maturity.toDateString() : "Not available"}</p>
+                    {daysLeft !== null && (
+                        <p className="text-red-500 mt-2">Next installment due in {daysLeft} days</p>
+                    )}
                 </div>
             </div>
 

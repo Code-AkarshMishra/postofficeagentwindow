@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const Customer = require("../models/Customer");
 const { signToken } = require("../utils/jwt");
+const { toCustomerView } = require("../utils/customerView");
 
 router.post("/", async (req, res) => {
   try {
@@ -32,13 +33,10 @@ router.post("/", async (req, res) => {
       role: "customer",
     });
 
-    const safeUser = user.toObject();
-    delete safeUser.password;
-
     res.json({
       success: true,
       token,
-      user: safeUser,
+      user: toCustomerView(user),
     });
   } catch (err) {
     console.error("Login error:", err.message);

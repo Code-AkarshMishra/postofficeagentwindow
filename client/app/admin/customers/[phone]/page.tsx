@@ -8,7 +8,10 @@ type Customer = {
     name: string;
     phone: string;
     paidMonths: number;
+    durationMonths: number;
     totalAmount: number;
+    dueDate?: string | null;
+    maturityDate?: string | null;
 };
 
 type RowProps = {
@@ -49,6 +52,10 @@ export default function CustomerDetail() {
         return <p className="p-6 text-gray-500">No data found</p>;
     }
 
+    const dueDate = user.dueDate ? new Date(user.dueDate).toDateString() : "Not available";
+    const maturityDate = user.maturityDate ? new Date(user.maturityDate).toDateString() : "Not available";
+    const remainingMonths = Math.max(user.durationMonths - user.paidMonths, 0);
+
     return (
         <div className="p-4 md:p-6">
             <h1 className="text-xl md:text-2xl font-semibold mb-4">
@@ -59,6 +66,9 @@ export default function CustomerDetail() {
                 <Row label="Name" value={user.name} />
                 <Row label="Account" value={user.phone} />
                 <Row label="Paid Months" value={user.paidMonths} />
+                <Row label="Months Left" value={remainingMonths} />
+                <Row label="Next Due Date" value={dueDate} />
+                <Row label="Maturity Date" value={maturityDate} />
                 <Row label="Total Amount" value={`₹${user.totalAmount}`} />
             </div>
         </div>

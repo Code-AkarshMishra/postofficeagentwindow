@@ -4,7 +4,7 @@ const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
-const app = expre
+const app = express();
 app.use(
   cors({
     origin: process.env.CLIENT_URL ||  "https://manojmishrahpopbh.vercel.app/",
@@ -49,6 +49,3 @@ async function startServer() {
 }
 
 startServer();
- {
-  console.log(`🚀 Server running on port ${PORT}`);
-};

@@ -45,6 +45,10 @@ const customerSchema = new mongoose.Schema(
       default: 0,
     },
 
+    dueDate: {
+      type: Date,
+    },
+
     maturityDate: {
       type: Date,
     },
