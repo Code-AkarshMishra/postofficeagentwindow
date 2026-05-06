@@ -539,15 +539,15 @@ export default function HomePage() {
                   <div className="flex justify-center -mt-20">
                     <img
                       src="/father.jpg"
-                      alt="Manoj Kumar Mishra"
+                      alt="Manoj Mishra Post Office Agent Pratapgarh"
                       className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-blue-400 shadow-xl object-cover"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <h2 className="text-2xl font-semibold text-slate-950 md:text-3xl">
+                    <h1 className="text-2xl font-semibold text-slate-950 md:text-3xl">
                       Manoj Kumar Mishra
-                    </h2>
+                    </h1>
                     <p className="text-sky-700 font-medium">
                       Authorized India Post Agent
                     </p>
